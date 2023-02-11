@@ -165,5 +165,6 @@ cython_debug/
 *.m4a
 *.mp4
 
-# Other file that is showing up
-.DS_Store
+# Other random files that are showing up
+*.DS_Store
+*.TextGrid
