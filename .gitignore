@@ -168,3 +168,7 @@ cython_debug/
 # Other random files that are showing up
 *.DS_Store
 *.TextGrid
+
+
+# Data folder
+speech_features/data/
