@@ -463,17 +463,17 @@ def librosa_features(file_name, wav_path):
     
     # Calculate statistics for different audio features from librosa library
     rms = pd.DataFrame(calc_mean_max_min_stdev(librosa.feature.rms(y=y))).T
-    rms.columns = [f'RMS_{i}' for i in ['Mean', 'Min', 'Max', 'Std']]
+    rms.columns = [f'RMS_{i}' for i in ['Mean', 'Max', 'Min', 'Std']]
     centroid = pd.DataFrame(calc_mean_max_min_stdev(librosa.feature.spectral_centroid(y=y))).T
-    centroid.columns = [f'Centroid_{i}' for i in ['Mean', 'Min', 'Max', 'Std']]
+    centroid.columns = [f'Centroid_{i}' for i in ['Mean', 'Max', 'Min', 'Std']]
     bandwidth = pd.DataFrame(calc_mean_max_min_stdev(librosa.feature.spectral_bandwidth(y=y))).T
-    bandwidth.columns = [f'Bandwidth_{i}' for i in ['Mean', 'Min', 'Max', 'Std']]
+    bandwidth.columns = [f'Bandwidth_{i}' for i in ['Mean', 'Max', 'Min', 'Std']]
     flatness = pd.DataFrame(calc_mean_max_min_stdev(librosa.feature.spectral_flatness(y=y))).T
-    flatness.columns = [f'Flatness_{i}' for i in ['Mean', 'Min', 'Max', 'Std']]
+    flatness.columns = [f'Flatness_{i}' for i in ['Mean', 'Max', 'Min', 'Std']]
     zero_crossing_rate = pd.DataFrame(calc_mean_max_min_stdev(librosa.feature.zero_crossing_rate(y=y))).T
-    zero_crossing_rate.columns = [f'Zero_Crossing_Rate_{i}' for i in ['Mean', 'Min', 'Max', 'Std']]
+    zero_crossing_rate.columns = [f'Zero_Crossing_Rate_{i}' for i in ['Mean', 'Max', 'Min', 'Std']]
     loudness = pd.DataFrame(calc_mean_max_min_stdev(librosa.amplitude_to_db(librosa.feature.rms(y=y)))).T
-    loudness.columns = [f'Loudness_{i}' for i in ['Mean', 'Min', 'Max', 'Std']]
+    loudness.columns = [f'Loudness_{i}' for i in ['Mean', 'Max', 'Min', 'Std']]
 
     # Combine into single dataframe
     df_librosa = pd.concat([rms, centroid, bandwidth, 
