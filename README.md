@@ -1,6 +1,9 @@
 # Teacher Mindfulness Analysis
 
-MSDS Capstone Project Spring 2023
+## MSDS Capstone Project Spring 2023
+- Students: Kaia Lindberg, Grace Lyons, Emma Cooper, Tulsi Ratnam
+- Sponsor: Tara Hofkens
+- Mentor: Abbas Kazemipour
 
 Repo Contents:
 - [**audio_transcription**](https://github.com/eycooper/capstone/tree/main/audio_transcription): the code here was used to test out a few APIs to transcribe the videos. However, the sample transcriptions from this method were not very accurate so this approach was not used in the end. Instead [Temi](https://www.temi.com/) was used to transcribe the audio files, providing transcription, speaker labels, and timestamps. 
