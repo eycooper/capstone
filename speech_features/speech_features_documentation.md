@@ -39,7 +39,7 @@ Variable Descriptions:
 
 The next set of features were generated using various Python libraries to calculate different speech characteristics from the teacher only audio files. The libraries and features used were inspired by a [study](https://www.jmir.org/2021/4/e24191) analyzing stress of health care professionals via speech analysis. Many of these features are continuous (vary over time) so some aggregation measures (e.g. mean, variance, min, max, etc.) were calculated for analysis of overall averages and variance for each teacher. 
 
-### My-Voice-Analysis Features
+### My-Voice-Analysis Library
 
 The Python [My-Voice-Analysis Library](https://github.com/Shahabks/my-voice-analysis) was used to generate audio features such as balance, pauses, speaking rate, and f0 stats. In order to generate these features this library "breaks utterances and detects syllable boundaries, fundamental frequency contours, and formants". 
 
@@ -55,5 +55,28 @@ Features extracted:
     - Various aggregations: mean, standard deviation (std), median, min, max, quantile25, quantile 75)
 - Mood: characteristic of mood of speech (e.g. reading, speaking passionately, showing no emotion)
 
+
+### Python Speech Features Library
+
+MFCC features were generating using the [python speech features library](https://github.com/jameslyons/python_speech_features). Mel-frequency cepstral coefficients (MFCCs) are a set of features commonly used in speech analysis and recognition. MFCCs are a set of features that help computers understand human speech better by capturing the unique aspects of a person's voice, like pitch and tone, and transforming them into a compact set of numbers that can be analyzed by algorithms. The number of coefficients can vary and is up to the user depending on the level of detail desired, but they generally get less informative with larger numbers so typically 10 to 20 are chosen. For each of the mel-frequency cepstrum (MFC) coefficients calculate the mean, variance, skewness, and kurtosis for the energy (static coefficient), velocity (first differential), and acceleration (second differential).
+
+Features extracted (for the first 13 coefficients):
+- Mean (e.g. MFCC_1_Mean)
+- Variance (e.g. MFCC_1_Var)
+- Skew (e.g. MFCC_1_Skew)
+- Kurtosis (e.g. MFCC_1_Kurtosis)
+
+
+### Librosa Library
+
+The final Python library used to generate speech features from the audio data is [librosa](https://pypi.org/project/librosa/). This library was used to generate several more features including rms, centroid, bandwidth, flatness, zero crossing rate, and loudness. Once again, these are continuous features so statistics including mean, max, min, and standard deviation (std) were calculated in order to analyze the average value and change/variance for each teacher. 
+
+Features extracted:
+- RMS: root mean square value, represents the average power of a signal and often represents a measure of the overall loudness.
+- Centroid: a spectral feature that represents the center of mass of the spectrum of a speech signal. In some applications, the centroid is also used as a feature for speaker identification and emotion recognition. Percentually, it is associatd with the impression of the "brightness" of a sound. 
+- Bandwidth: refers to the range of frequencies contained in a speech signal. Bandwidth is an important characteristic of a speech signal as it can provide information about the overall frequency content of the speech and can be used to distinguish different speech sounds and patterns.
+- Flatness: a measure of the tonality of a speech signal that quantifies how evenly the power is distributed across the frequency spectrum.
+- Zero Crossing Rate: a measure of the number of times that a speech signal crosses the horizontal axis (i.e., has a zero value) per unit of time. Often used as a measure of the temporal variation (frequency and magnitude of fluctuations) in a speech signal, with a higher ZCR indicating a higher level of temporal variation and a lower ZCR indicating a lower level of temporal variation.
+- Loudness: measure of the intensity of the speech signal.
 
 
