@@ -1,1 +1,0 @@
-The files in this audio_transcription were used to test out a few APIs to transcribe the videos. However, the sample transcriptions from this method were not very accurate so this approach was not used in the end.
