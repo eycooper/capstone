@@ -7,6 +7,19 @@ This file goes over the different methods and analysis applied to the transcribe
 A list and description of the files used in the analysis
 
 - TOKEN.csv: A hierarchical file that represents each word (token) as a single row
+|Field |Description|
+|-----|--------|
+|speaker_id|unique id of teacher|
+|line_num  |position of the 'paragraph' within the text|
+|sent_num  |position of the sentence within a line|
+|token_num |position of the token within a sentence|
+|pos_tuple |tuple in the format ('token_str', 'pos')|
+|pos       |the token's part of speech|
+|token_str |the token (word) as it appears in text|
+|term_str  |the token after removing punctuation and capitilization|
+|term_id   |unique_id of the term|
+
+
     - speaker_id - unique id of the teacher/speaker
     - line_num - the number of the line the word appears in
     - sent_num - the number of the sentence the word appears in (note that the sentence count is within the line, so a new line starts the count over)
