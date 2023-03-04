@@ -10,7 +10,7 @@ A list and description of the files used in the analysis
 
 
 |Field |Description|
-|----- |-----------|
+|:-----: |:-----------:|
 |speaker_id|unique id of teacher|
 |line_num  |position of the 'paragraph' within the text|
 |sent_num  |position of the sentence within a line|
