@@ -7,8 +7,10 @@ This file goes over the different methods and analysis applied to the transcribe
 A list and description of the files used in the analysis
 
 - TOKEN.csv: A hierarchical file that represents each word (token) as a single row
+
+
 |Field |Description|
-|-----|--------|
+|----- |-----------|
 |speaker_id|unique id of teacher|
 |line_num  |position of the 'paragraph' within the text|
 |sent_num  |position of the sentence within a line|
