@@ -41,7 +41,7 @@ A list and description of the files used in the analysis
 
 This is a technique where we analyzed each piece of text to determine the sentiment behind it. The analysis focuses on emotion detection also known as a lexicon method of sentiment analysis. Sentiments such as happy, sad, anger, and so on come under emotion detection. 
 
-See [sentiment_analysis.ipynb] (https://github.com/eycooper/capstone/tree/main/text_analytics_code/sentiment_analysis.ipynb) for code
+See [sentiment_analysis.ipynb](https://github.com/eycooper/capstone/tree/main/text_analytics_code/sentiment_analysis.ipynb) for code
 
 
 ### Lexicon
@@ -61,3 +61,22 @@ To conduct the analysis we transform the file, the sentiment values become colum
 |abandon|0|0|0|1|0|1|0|1|0|0|
 
 The lexicon is then joined with TOKEN.csv. 
+
+### Visuals
+
+Description of visuals created in the Sentiment Analysis file.
+
+## Sentiment Bar Charts
+
+![Sentiment Bar Charts](/sentiment_bar_charts/201.png)
+
+These bar charts are a visual representation of the average sentiment present in the document/body of text given. The numerical values are calculated by summing up each instance of a word that induces that emotion and then divided by the number of tokens present. 
+
+### Vader Metrics
+
+![positive_negative](/pos_neg/speaker_201.png)
+![neutral](/neu/speaker_201.png)
+![compound](/compound/speaker_201.png)
+
+Using the VaderSentiment library, three line graphs are generated. The pos, neu, and neg scores are ratios for proportions of text that fall in each category (so these should all add up to be 1 or close to it with float operation). The compound score is computed by summing the valence scores of each word in the lexicon, adjusted according to the rules, and then normalized to be between -1 (most extreme negative) and +1 (most extreme positive). This is the most useful metric if you want a single unidimensional measure of sentiment for a given sentence. Calling it a ‘normalized, weighted composite score’ is accurate.
+
