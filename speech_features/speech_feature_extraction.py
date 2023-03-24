@@ -63,7 +63,9 @@ def convert_m4a_to_wav(file_name, m4a_path, wav_path):
 Extract Only Teacher Audio
 
 '''
-def extract_teacher_timestamps(file_name, transcript_path, teacher_speaker_num):
+def extract_teacher_timestamps(file_name, transcript_path, teacher_speaker_num,
+                              txt_delimeter = "                                             ",
+                              adjust_timestamps = False):
     '''
     Create a list of timestamp pairs in between which the teacher is speaking
     
@@ -71,7 +73,13 @@ def extract_teacher_timestamps(file_name, transcript_path, teacher_speaker_num):
         - file_name: name of original file
         - transcript_path: directory containing transcripts
         - teacher_speaker_num: integer of which speaker number in the transcript corresponds to the teacher 
-    
+        - txt_delimeter: delimeter for txt file
+        - adjust_timestamps: whether or not to adjust start times 
+            For chunked files the timestamps in the transcript will align with the original file
+            and thus will not work with the new chunked file.
+            So in those cases we'll need to adjust each timestamp by subtracting the start time
+            
+        
     Returns:
         - List of timestamp pairs between which the teacher is the speaker
     '''
@@ -79,13 +87,19 @@ def extract_teacher_timestamps(file_name, transcript_path, teacher_speaker_num):
     # Read in transcript
     df = pd.read_csv(transcript_path + file_name + '.txt', 
                  engine = 'python', 
-                 delimiter = "                                             ",
+                 delimiter = txt_delimeter,
                  header = None)
     
     df.columns = ['Speaker', 'Timestamp', 'Text']
 
     # Create a column that converts the timestamps to seconds
     df['Timestamp_Secs'] = df['Timestamp'].apply(convert_time_to_seconds)
+    
+    # Adjust timestamps if needed
+    if adjust_timestamps:
+        if 'Chunk_0' not in file_name:
+            start_time = df['Timestamp_Secs'].iloc[0]
+            df['Timestamp_Secs'] = df['Timestamp_Secs'] - start_time
     
     # Create a column with pairs of timestamps
     df['Timestamp_Pairs'] = df.apply(create_timestamp_pairs, col = 'Timestamp_Secs', df = df, axis=1)
@@ -150,7 +164,9 @@ def create_timestamp_pairs(row, col, df):
     return (current_timestamp, next_timestamp)
 
 
-def extract_teacher_audio(file_name, wav_path, teacher_wav_path, transcript_path, teacher_speaker_num):
+def extract_teacher_audio(file_name, wav_path, teacher_wav_path, transcript_path, teacher_speaker_num,
+                          txt_delimeter = "                                             ",
+                          adjust_timestamps = False):
     '''
     Extract the audio from the .wav file between each timestamp pair in the list.
     Saves as a new .wav file
@@ -161,13 +177,18 @@ def extract_teacher_audio(file_name, wav_path, teacher_wav_path, transcript_path
         - teacher_wav_path: directory to save .wav file with just teacher
         - transcript_path: directory containing transcript files
         - teacher_speaker_num: integer of which speaker number in the transcript corresponds to the teacher 
+        - txt_delimeter: delimeter for txt file
+        - adjust_timestamps: whether or not to adjust start times 
+            For chunked files the timestamps in the transcript will align with the original file
+            and thus will not work with the new chunked file.
+            So in those cases we'll need to adjust each timestamp by subtracting the start time
     
     Returns:
         - nothing, but saves teacher only audio to teacher_wav_path
     '''
     # Get timestamp pairs 
     # (list of pairs of timestamps (in seconds) in between which the teacher is speaking)
-    timestamp_pairs = extract_teacher_timestamps(file_name, transcript_path, 2)
+    timestamp_pairs = extract_teacher_timestamps(file_name, transcript_path, teacher_speaker_num, txt_delimeter, adjust_timestamps)
     
     
     with wave.open(wav_path + file_name + '.wav', 'rb') as wave_file:
@@ -211,7 +232,8 @@ def extract_teacher_audio(file_name, wav_path, teacher_wav_path, transcript_path
 Extract Features from Transcripts
 '''
 
-def extract_transcript_features(file_name, transcript_path, wav_path, teacher_speaker_num):
+def extract_transcript_features(file_name, transcript_path, wav_path, teacher_speaker_num,
+                                txt_delimeter = "                                             "):
     '''
     Generate several features from transcript files (with timestamps and speaker labels) such as:
     
@@ -225,6 +247,7 @@ def extract_transcript_features(file_name, transcript_path, wav_path, teacher_sp
         - transcript_path: directory containing transcript files
         - wav_path: directory containing .wav file
         - teacher_speaker_num: integer of which speaker number in the transcript corresponds to the teacher 
+        - txt_delimeter:delimeter for txt file
     
     Returns:
         - dataframe with teacher ID and features
@@ -232,7 +255,7 @@ def extract_transcript_features(file_name, transcript_path, wav_path, teacher_sp
     # Read in transcript
     df = pd.read_csv(transcript_path + file_name + '.txt', 
                  engine = 'python', 
-                 delimiter = "                                             ",
+                 delimiter = txt_delimeter,
                  header = None)
     df.columns = ['Speaker', 'Timestamp', 'Text']
     
@@ -270,6 +293,7 @@ def extract_transcript_features(file_name, transcript_path, wav_path, teacher_sp
     
     # Create a dictionary with some features we may want from this data
     summary_dict = {'ID': file_name[0:3], 
+                    'File_Name': file_name,
                      # Duration realted features
                      'Total_Duration': duration,
                      'Teacher_Duration': teacher_duration,
@@ -350,7 +374,8 @@ def extract_audio_features(file_name, wav_path, num_mfccs = 13):
     df_librosa = librosa_features(file_name, wav_path)
     
     # Create summary dataframe with ID from file name
-    df_summary = pd.DataFrame({'ID': file_name[0:3]}, index = [0])
+    df_summary = pd.DataFrame({'ID': file_name[0:3], 
+                               'File_Name': file_name}, index = [0])
     
     # Combine into single dataframe
     df_summary = pd.concat([df_summary, df_my_voice, df_python_speech, df_librosa], axis=1)
@@ -445,7 +470,7 @@ def python_speech_features(file_name, wav_path, num_mfccs = 13):
 
 
 def librosa_features(file_name, wav_path):
-        '''
+    '''
     Generate audio features using librosa library (https://pypi.org/project/librosa/)
     
     Calculate the mean, maximum, minimum, and standard deviation of the root mean square value, centroid, bandwidth, flatness, zero-crossing rate, and loudness of the spectrogram, or the visualization of the recording.
@@ -457,7 +482,8 @@ def librosa_features(file_name, wav_path):
     Returns:
         - dataframe with teacher ID and summarized audio features
     '''
-        
+    
+    
     # Load the WAV file using librosa
     y, sr = librosa.load(wav_path + file_name + '.wav')
     
@@ -494,3 +520,80 @@ def calc_mean_max_min_stdev(array):
         - list of mean, max, min, and standard deviation for that array
     '''
     return [np.mean(array), np.max(array), np.min(array), np.std(array)]
+
+
+def chunk_wav_transcript_file(file_name, wav_path, transcript_path, chunked_wav_path, chunked_transcript_path, num_chunks = 5):
+    '''
+    Split the .wav audio files and transcript .txt files into 1 minute chunk
+    so that we have num_chunks approximately 1 minute long chunks
+    
+    
+    file_name: name of original file (identifies participant id)
+    wav_path: directory containing .wav file
+    transcript_path: directory containing transcript .txt files
+    chunked_wav_path: directory for chunked .wav files
+    chunked_transcript_path: directory for chunked transcript files
+    num_chunks: number of 1 minute chunks to create (5 because videos are approximately 5 minutes long)
+    '''
+    
+    with wave.open(wav_path + file_name + '.wav', 'rb') as wave_file:
+        # Calculate duration of audio file
+        # Get the number of frames and the frame rate
+        num_frames = wave_file.getnframes()
+        frame_rate = wave_file.getframerate()
+        # Calculate duration of audio file (in seconds)
+        duration = num_frames / float(frame_rate)
+
+        # Read in transcript file
+        df = pd.read_csv(transcript_path + file_name + '.txt', 
+                         engine = 'python', 
+                         delimiter = "                                             ",
+                         header = None)
+        df.columns = ['Speaker', 'Timestamp', 'Text']
+        df['Timestamp_Secs'] = df['Timestamp'].apply(convert_time_to_seconds)
+
+        # Calculate the row index of the closest timestamp value to each chunk's seconds
+        row_indices = [abs(df['Timestamp_Secs'] - (i+1)*60).idxmin() for i in range(num_chunks)]
+        # Add first row to be start
+        row_indices.insert(0, 0)
+        # Update last entry to be last row
+        row_indices[-1] = df.shape[0] - 1
+
+        # Chunk transcript and audio file
+        for i in range(num_chunks):
+            current_idx = row_indices[i]
+            next_idx = row_indices[i+1]
+            # If first chunk, update start time to be 0
+            start_time = 0 if i == 0 else df.iloc[current_idx]['Timestamp_Secs']
+            # If last chunk, update end time to be total duration of file
+            end_time = duration if i == (num_chunks - 1) else df.iloc[next_idx]['Timestamp_Secs']
+            # Get timestamp pair
+            timestamp_pair = (start_time, end_time)
+
+            # Extract this chunk's portion of the audio file
+            start_frame = int(start_time * frame_rate)
+            end_frame = int(end_time * frame_rate)
+            wave_file.setpos(start_frame)
+            segment_frames = wave_file.readframes(end_frame - start_frame)
+            segment = np.frombuffer(segment_frames, dtype=np.int16)
+
+            # Create a new .wav file for this chunk of the audio file
+            with wave.open(chunked_wav_path + file_name + f'_Chunk_{i}' + '.wav', 'wb') as output_wave_file:
+                output_wave_file.setnchannels(1)
+                output_wave_file.setsampwidth(2)
+                output_wave_file.setframerate(frame_rate)
+                output_wave_file.setnframes(len(segment))
+                output_wave_file.writeframes(segment.tobytes())
+
+            # Extract this chunk's portion of the transcript
+            if i != num_chunks - 1:
+                df_temp = df.iloc[current_idx: next_idx]
+            else:
+                df_temp = df.iloc[current_idx: ]
+            # Remove timestamp in seconds columns that I created
+            df_temp = df_temp.drop('Timestamp_Secs', axis = 1)
+            # Save
+            df_temp.to_csv(chunked_transcript_path + file_name + f'_Chunk_{i}' + '.txt', 
+                           sep = "\t",
+                           index=False, header=False)
+
